@@ -2,9 +2,9 @@
   <div>
     <NavBar />
     <br />
-    <v-container class="grey lighten-5">
-      <v-row v-for="cat in categories" :key="cat.category_id" no-gutters>
-        <h1 class="mb-2 mt-4 ml-0" v-if="!cat.isInputVisible">
+    <v-container>
+      <v-row v-for="cat in categories" :key="cat.category_id">
+        <h1 class="mb-2 mt-0 ml-0" v-if="!cat.isInputVisible">
           {{ cat.category_name }}
           <v-btn icon rounded @click="toggle(cat)">
             <v-icon class="blue--text text--darken-2">mdi-pencil</v-icon>
@@ -23,15 +23,42 @@
               />
             </v-col>
             <v-col cols="9" style="margin-top: 1.5%">
-              <v-btn icon rounded @click="toggle(cat)">
+              <v-btn icon rounded @click="toggleInput(cat)">
                 <v-icon class="green--text">mdi-check</v-icon>
               </v-btn>
             </v-col>
           </v-row>
         </div>
         <v-col v-for="prod in cat.products" :key="prod.product_id" cols="3">
-          <v-card class="pa-2" outlined tile> {{ prod.product_name }} </v-card>
+          <v-card class="pa-0 mb-4" outlined tile>
+            <v-card-title>
+              <h3>{{ prod.product_name }}</h3>
+            </v-card-title>
+            <v-card-text class="pb-0">
+              <h5>Price : {{ prod.product_price }} {{ prod.product_unit }}</h5>
+              <h5>Available : {{ prod.product_quantity }}</h5>
+            </v-card-text>
+            <v-card-actions>
+              <v-btn
+                class="ml-0 pl-0 mb-2"
+                color="primary"
+                plain
+                @click="toggleEditProduct(prod)"
+              >
+                Edit
+              </v-btn>
+              <v-btn
+                class="ml-2 pl-0 mb-2"
+                color="error"
+                plain
+                @click="removeProduct(prod.product_id)"
+              >
+                Delete
+              </v-btn>
+            </v-card-actions>
+          </v-card>
         </v-col>
+        <hr />
       </v-row>
       <v-btn
         fab
@@ -44,6 +71,7 @@
         <v-icon>{{ showOptions ? "mdi-close" : "mdi-plus" }}</v-icon>
       </v-btn>
 
+      <!-- This is the floating button transition -->
       <transition name="fade">
         <div v-if="showOptions" class="options">
           <v-tooltip left>
@@ -117,7 +145,7 @@
             <v-select
               :items="units"
               v-model="new_product.unit"
-              label="Category name"
+              label="Product Unit"
             ></v-select>
             <v-text-field
               v-model="new_product.quantity"
@@ -172,6 +200,52 @@
         </v-card>
       </v-form>
     </v-dialog>
+
+    <!-- This is dialog of product editing -->
+    <v-dialog
+      persistent
+      v-model="dialog3"
+      width="500"
+      transition="dialog-top-transition"
+    >
+      <v-card>
+        <v-card-title class="text-h4 grey lighten-2"
+          >Edit Product - {{ edit_product.name }}</v-card-title
+        >
+        <v-card-text class="mt-4 pb-2">
+          <v-form ref="form" lazy-validation @submit.prevent>
+            <v-text-field
+              v-model="edit_product.price"
+              label="Product Price"
+              type="number"
+              required
+              :rules="rules"
+            ></v-text-field>
+            <v-select
+              :items="units"
+              v-model="edit_product.unit"
+              label="Product Unit"
+            ></v-select>
+            <v-text-field
+              v-model="edit_product.quantity"
+              label="Product quantity"
+              required
+              type="number"
+              :rules="rules"
+            ></v-text-field>
+          </v-form>
+        </v-card-text>
+        <v-divider></v-divider>
+        <v-card-actions class="justify-end pt-0 pb-3">
+          <v-btn type="button" color="error" @click="closeDialog(2)">
+            Close
+          </v-btn>
+          <v-btn type="button" color="primary" @click="patchProduct">
+            Update
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -190,6 +264,7 @@ export default {
       fab: false,
       isInputVisible: false,
       dialog2: false,
+      dialog3: false,
       selected: null,
       units: ["Rs/kg", "Rs/dozen", "Rs/litre", "Rs/piece"],
       new_category: {
@@ -197,6 +272,12 @@ export default {
       },
       new_product: {
         name: "",
+        unit: "",
+        price: "",
+        quantity: "",
+      },
+      edit_product: {
+        product_id: "",
         unit: "",
         price: "",
         quantity: "",
@@ -224,6 +305,11 @@ export default {
         this.dialog = false;
       } else if (num === 1) {
         this.dialog2 = false;
+      } else if (num === 2) {
+        this.dialog3 = false;
+        for (let i in this.edit_product) {
+          this.edit_product[i] = null;
+        }
       }
     },
     patchCategory: function (cat_id, cat_name) {
@@ -243,9 +329,9 @@ export default {
         console.log(error);
       }
     },
-    toggleInput: function () {
+    toggleInput: function (cat) {
       this.isInputVisible = !this.isInputVisible;
-      // this.patchCategory(cat_id, cat_name);
+      this.patchCategory(cat.category_id, cat.category_name);
     },
     toggle: function (cat) {
       cat.isInputVisible = !cat.isInputVisible;
@@ -318,6 +404,39 @@ export default {
       } catch (error) {
         console.log(error);
       }
+    },
+    removeProduct: function (prod) {
+      axios
+        .delete("http://127.0.0.1:5000/products?product_id=" + prod)
+        .then((res) => {
+          console.log(res);
+          this.loader();
+        });
+    },
+    toggleEditProduct: function (prod) {
+      this.dialog3 = true;
+      this.edit_product.product_id = prod.product_id;
+      this.edit_product.price = prod.product_price;
+      this.edit_product.unit = prod.product_unit;
+      this.edit_product.quantity = prod.product_quantity;
+    },
+    patchProduct: function () {
+      axios
+        .put(
+          "http://127.0.0.1:5000/products?product_id=" +
+            this.edit_product.product_id,
+          this.edit_product,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        )
+        .then((response) => {
+          console.log(response);
+          this.loader();
+          this.dialog3 = false;
+        });
     },
   },
 };
