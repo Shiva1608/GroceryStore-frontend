@@ -6,63 +6,79 @@
       <v-row v-for="cat in categories" :key="cat.category_id">
         <h1 class="mb-2 mt-0 ml-0" v-if="!cat.isInputVisible">
           {{ cat.category_name }}
-          <v-btn icon rounded @click="toggle(cat)">
+          <v-btn icon large rounded @click="toggle(cat)">
             <v-icon class="blue--text text--darken-2">mdi-pencil</v-icon>
           </v-btn>
-          <v-btn icon rounded @click="deleteCat(cat.category_id)">
+          <v-btn icon large rounded @click="deleteCat(cat.category_id)">
             <v-icon class="red--text text--darken-2">mdi-delete</v-icon>
           </v-btn>
         </h1>
         <div v-if="cat.isInputVisible">
           <v-row>
-            <v-col cols="3">
+            <v-col :cols="getColumns(0)">
               <v-text-field
                 style="width: 100%"
                 v-model="cat.category_name"
                 placeholder="Type something"
               />
             </v-col>
-            <v-col cols="9" style="margin-top: 1.5%">
+            <v-col class="pt-7" :cols="getColumns(1)">
               <v-btn icon rounded @click="toggleInput(cat)">
                 <v-icon class="green--text">mdi-check</v-icon>
               </v-btn>
             </v-col>
           </v-row>
         </div>
-        <v-col v-for="prod in cat.products" :key="prod.product_id" cols="3">
-          <v-card class="pa-0 mb-4" outlined tile>
+        <v-col
+          v-for="prod in cat.products"
+          :key="prod.product_id"
+          :cols="getColumns(2)"
+        >
+          <v-card
+            class="pa-0 mb-4"
+            elevation="15"
+            outlined
+            shaped
+            max-width="300"
+          >
             <v-card-title>
               <h3>{{ prod.product_name }}</h3>
             </v-card-title>
             <v-card-text class="pb-0">
-              <h5>Price : {{ prod.product_price }} {{ prod.product_unit }}</h5>
-              <h5>Available : {{ prod.product_quantity }}</h5>
+              <h5 class="text-h6">
+                Price : {{ prod.product_price }} {{ prod.product_unit }}
+              </h5>
+              <h5 class="text-h6">Available : {{ prod.product_quantity }}</h5>
             </v-card-text>
-            <v-card-actions>
-              <v-btn
-                class="ml-0 pl-0 mb-2"
-                color="primary"
-                plain
-                @click="toggleEditProduct(prod)"
-              >
-                Edit
-              </v-btn>
-              <v-btn
-                class="ml-2 pl-0 mb-2"
-                color="error"
-                plain
-                @click="removeProduct(prod.product_id)"
-              >
-                Delete
-              </v-btn>
-            </v-card-actions>
+            <v-btn
+              class="ml-0 pl-0 mb-2"
+              color="primary"
+              large
+              plain
+              @click="toggleEditProduct(prod)"
+            >
+              Edit
+            </v-btn>
+            <v-btn
+              class="ml-2 pl-0 mb-2"
+              color="error"
+              plain
+              large
+              @click="removeProduct(prod.product_id)"
+            >
+              Delete
+            </v-btn>
           </v-card>
         </v-col>
         <hr />
       </v-row>
+
+      <!-- This is the Floating plus button -->
       <v-btn
         fab
         dark
+        x-large
+        elevation="30"
         color="primary"
         @click="toggleOptions"
         :class="{ 'rotate-transition': showOptions }"
@@ -81,6 +97,7 @@
                 v-on="on"
                 fab
                 dark
+                large
                 color="teal"
                 @click="openDialog(1)"
               >
@@ -97,6 +114,7 @@
                 v-on="on"
                 fab
                 dark
+                large
                 color="orange"
                 @click="openDialog(0)"
               >
@@ -210,7 +228,7 @@
     >
       <v-card>
         <v-card-title class="text-h4 grey lighten-2"
-          >Edit Product - {{ edit_product.name }}</v-card-title
+          >Edit Product - {{ edit_product.product_name }}</v-card-title
         >
         <v-card-text class="mt-4 pb-2">
           <v-form ref="form" lazy-validation @submit.prevent>
@@ -278,6 +296,7 @@ export default {
       },
       edit_product: {
         product_id: "",
+        product_name: "",
         unit: "",
         price: "",
         quantity: "",
@@ -415,6 +434,7 @@ export default {
     },
     toggleEditProduct: function (prod) {
       this.dialog3 = true;
+      this.edit_product.product_name = prod.product_name;
       this.edit_product.product_id = prod.product_id;
       this.edit_product.price = prod.product_price;
       this.edit_product.unit = prod.product_unit;
@@ -437,6 +457,40 @@ export default {
           this.loader();
           this.dialog3 = false;
         });
+    },
+    getColumns(num) {
+      const screenWidth = this.$vuetify.breakpoint.width;
+      if (num === 2) {
+        if (screenWidth < 600) {
+          return 12; // Extra small screens
+        } else if (screenWidth < 960) {
+          return 6; // Small screens
+        } else if (screenWidth < 1280) {
+          return 4; // Medium screens
+        } else {
+          return 3; // Large screens
+        }
+      } else if (num === 0) {
+        if (screenWidth < 600) {
+          return 6; // Extra small screens
+        } else if (screenWidth < 960) {
+          return 4; // Small screens
+        } else if (screenWidth < 1280) {
+          return 3; // Medium screens
+        } else {
+          return 3; // Large screens
+        }
+      } else if (num === 1) {
+        if (screenWidth < 600) {
+          return 6; // Extra small screens
+        } else if (screenWidth < 960) {
+          return 8; // Small screens
+        } else if (screenWidth < 1280) {
+          return 9; // Medium screens
+        } else {
+          return 9; // Large screens
+        }
+      }
     },
   },
 };
@@ -463,14 +517,14 @@ export default {
 
 .options {
   position: fixed;
-  bottom: 80px;
-  right: 20px;
+  bottom: 100px;
+  right: 28px;
   display: flex;
   flex-direction: column;
 }
 
 .plus-button {
-  position: absolute;
+  position: fixed;
   right: 20px;
   bottom: 20px;
 }
