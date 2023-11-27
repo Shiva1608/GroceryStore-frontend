@@ -51,7 +51,7 @@
               <h5 class="text-h6">Available : {{ prod.product_quantity }}</h5>
             </v-card-text>
             <v-btn
-              class="ml-0 pl-0 mb-2"
+              class="ml-0 pl-4 mb-2"
               color="primary"
               large
               plain
@@ -158,7 +158,7 @@
               label="Product Price"
               type="number"
               required
-              :rules="rules"
+              :rules="number_rules"
             ></v-text-field>
             <v-select
               :items="units"
@@ -170,7 +170,7 @@
               label="Product quantity"
               required
               type="number"
-              :rules="rules"
+              :rules="number_rules"
             ></v-text-field>
           </v-form>
         </v-card-text>
@@ -237,7 +237,7 @@
               label="Product Price"
               type="number"
               required
-              :rules="rules"
+              :rules="number_rules"
             ></v-text-field>
             <v-select
               :items="units"
@@ -249,7 +249,7 @@
               label="Product quantity"
               required
               type="number"
-              :rules="rules"
+              :rules="number_rules"
             ></v-text-field>
           </v-form>
         </v-card-text>
@@ -285,6 +285,7 @@ export default {
       dialog3: false,
       selected: null,
       units: ["Rs/kg", "Rs/dozen", "Rs/litre", "Rs/piece"],
+      number_rules: [(value) => value > 0 || "Should be greater than 0!"],
       new_category: {
         name: "",
       },

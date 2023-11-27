@@ -6,7 +6,6 @@
     <h1 v-if="items.length === 0" style="text-align: center">
       NO ITEMS IN CART!
     </h1>
-    <br />
     <router-link v-if="items.length === 0" to="/customer"
       ><h3 style="text-align: center">Continue shopping ?</h3></router-link
     >
@@ -94,6 +93,7 @@ export default {
           sortable: false,
         },
       ],
+      email: null,
     };
   },
 
@@ -103,7 +103,8 @@ export default {
 
   methods: {
     loader: function () {
-      axios.get("http://127.0.0.1:5000/cart/1").then((res) => {
+      this.email = localStorage.getItem("email");
+      axios.get("http://127.0.0.1:5000/cart/" + this.email).then((res) => {
         this.items = res.data;
         this.items.forEach((item) => {
           this.total +=
@@ -113,7 +114,9 @@ export default {
     },
     deleteCartItem: function (prod_id) {
       axios
-        .delete("http://127.0.0.1:5000/cart/1?prod_id=" + prod_id)
+        .delete(
+          "http://127.0.0.1:5000/cart/" + this.email + "?prod_id=" + prod_id
+        )
         .then((response) => {
           console.log(response);
           this.loader();
@@ -124,7 +127,9 @@ export default {
     },
     placeOrder: async function () {
       try {
-        const res = await axios.patch("http://127.0.0.1:5000/cart/1");
+        const res = await axios.patch(
+          "http://127.0.0.1:5000/cart/" + this.email
+        );
         console.log(res);
         window.location = "/customer";
       } catch (err) {

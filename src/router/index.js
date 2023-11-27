@@ -3,12 +3,18 @@ import VueRouter from "vue-router";
 import ManagerHome from "../views/ManagerHome.vue";
 import CustomerHome from "../views/CustomerHome.vue";
 import Cart from "../views/Cart.vue";
+import LoginSignup from "../views/LoginSignup.vue";
 
 Vue.use(VueRouter);
 
 const routes = [
   {
     path: "/",
+    name: "LoginSignup",
+    component: LoginSignup,
+  },
+  {
+    path: "/manager",
     name: "ManagerHome",
     component: ManagerHome,
   },

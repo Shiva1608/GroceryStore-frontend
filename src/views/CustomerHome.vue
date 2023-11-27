@@ -28,14 +28,27 @@
               </h5>
             </v-card-text>
             <v-btn
-              v-if="checkCart(prod.product_id)"
+              v-if="checkCart(prod.product_id) && prod.product_quantity > 0"
               class="ml-4 mb-4 mt-2"
               color="success"
               @click="toggleAddToCart(prod)"
             >
               Buy Now
             </v-btn>
-            <v-btn v-else class="ml-4 mb-4 mt-2" color="error"> In cart </v-btn>
+            <v-btn
+              v-if="prod.product_quantity === 0"
+              class="ml-4 mb-4 mt-2"
+              color="error"
+            >
+              Out of Stock
+            </v-btn>
+            <v-btn
+              v-if="!checkCart(prod.product_id)"
+              class="ml-4 mb-4 mt-2"
+              color="error"
+            >
+              In cart
+            </v-btn>
           </v-card>
         </v-col>
         <hr />
@@ -101,6 +114,7 @@ export default {
       categories: [],
       dialog: false,
       cart: [],
+      email: null,
       cart_item: {
         id: "",
         name: "",
@@ -121,8 +135,9 @@ export default {
 
   methods: {
     async loader() {
+      this.email = localStorage.getItem("email");
       try {
-        const res = await axios.get("http://127.0.0.1:5000/cart/1");
+        const res = await axios.get("http://127.0.0.1:5000/cart/" + this.email);
         this.cart = res.data;
         const response = await axios.get("http://127.0.0.1:5000/categories");
         this.categories = response.data.map((cat) => ({
@@ -188,7 +203,7 @@ export default {
       }
       axios
         .post(
-          "http://127.0.0.1:5000/cart/1",
+          "http://127.0.0.1:5000/cart/" + this.email,
           {
             prod_id: this.cart_item.id,
             quantity: this.cart_item.quantity,
