@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <NavBar />
+    <NavBar :title="email.split('@')[0]" :role="role" />
     <br />
     <h1 v-if="items.length > 0" style="text-align: center">CART</h1>
     <h1 v-if="items.length === 0" style="text-align: center">
@@ -93,7 +93,8 @@ export default {
           sortable: false,
         },
       ],
-      email: null,
+      email: "",
+      role: "",
     };
   },
 
@@ -104,18 +105,31 @@ export default {
   methods: {
     loader: function () {
       this.email = localStorage.getItem("email");
-      axios.get("http://127.0.0.1:5000/cart/" + this.email).then((res) => {
-        this.items = res.data;
-        this.items.forEach((item) => {
-          this.total +=
-            parseInt(item.quantity) * parseInt(item.product.product_price);
+      this.role = localStorage.getItem("role");
+      axios
+        .get("http://127.0.0.1:5000/cart/" + this.email, {
+          headers: {
+            "Authentication-Token": localStorage.getItem("auth-token"),
+          },
+        })
+        .then((res) => {
+          this.total = 0;
+          this.items = res.data;
+          this.items.forEach((item) => {
+            this.total +=
+              parseInt(item.quantity) * parseInt(item.product.product_price);
+          });
         });
-      });
     },
     deleteCartItem: function (prod_id) {
       axios
         .delete(
-          "http://127.0.0.1:5000/cart/" + this.email + "?prod_id=" + prod_id
+          "http://127.0.0.1:5000/cart/" + this.email + "?prod_id=" + prod_id,
+          {
+            headers: {
+              "Authentication-Token": localStorage.getItem("auth-token"),
+            },
+          }
         )
         .then((response) => {
           console.log(response);
@@ -128,7 +142,13 @@ export default {
     placeOrder: async function () {
       try {
         const res = await axios.patch(
-          "http://127.0.0.1:5000/cart/" + this.email
+          "http://127.0.0.1:5000/cart/" + this.email,
+          null,
+          {
+            headers: {
+              "Authentication-Token": localStorage.getItem("auth-token"),
+            },
+          }
         );
         console.log(res);
         window.location = "/customer";

@@ -161,6 +161,8 @@ export default {
             window.location = "/manager";
           } else if (role === "customer") {
             window.location = "/customer";
+          } else if (role === "admin") {
+            window.location = "/admin";
           }
         } else {
           this.error = response.data.error;

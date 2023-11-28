@@ -1,6 +1,6 @@
 <template>
   <div>
-    <NavBar />
+    <NavBar :title="email.split('@')[0]" :role="role" />
     <br />
     <v-container>
       <v-row v-for="cat in categories" :key="cat.category_id">
@@ -279,6 +279,7 @@ export default {
       rules: [(value) => !!value || "Required!"],
       categories: null,
       showOptions: false,
+      email: "",
       fab: false,
       isInputVisible: false,
       dialog2: false,
@@ -302,6 +303,7 @@ export default {
         price: "",
         quantity: "",
       },
+      role: "",
     };
   },
   mounted() {
@@ -309,8 +311,14 @@ export default {
   },
   methods: {
     loader: async function () {
+      this.email = localStorage.getItem("email");
+      this.role = localStorage.getItem("role");
       try {
-        const response = await axios.get("http://127.0.0.1:5000/categories");
+        const response = await axios.get("http://127.0.0.1:5000/categories", {
+          headers: {
+            "Authentication-Token": localStorage.getItem("auth-token"),
+          },
+        });
         this.categories = response.data.map((cat) => ({
           ...cat,
           isInputVisible: false,
@@ -339,7 +347,13 @@ export default {
             "http://127.0.0.1:5000/categories/" +
               cat_id +
               "?new_cat=" +
-              cat_name
+              cat_name,
+            null,
+            {
+              headers: {
+                "Authentication-Token": localStorage.getItem("auth-token"),
+              },
+            }
           )
           .then((response) => {
             console.log(response);
@@ -375,6 +389,7 @@ export default {
           .post("http://127.0.0.1:5000/categories", this.new_category, {
             headers: {
               "Content-Type": "application/json",
+              "Authentication-Token": localStorage.getItem("auth-token"),
             },
           })
           .then((response) => {
@@ -387,10 +402,8 @@ export default {
       }
     },
     createProduct: function () {
-      if (!this.$refs.form.validate()) {
-        if (this.selected === null) {
-          return;
-        }
+      if (!this.$refs.form.validate() || this.selected === null) {
+        return;
       }
       try {
         axios
@@ -400,6 +413,7 @@ export default {
             {
               headers: {
                 "Content-Type": "application/json",
+                "Authentication-Token": localStorage.getItem("auth-token"),
               },
             }
           )
@@ -416,7 +430,11 @@ export default {
     deleteCat: function (cat_id) {
       try {
         axios
-          .delete("http://127.0.0.1:5000/categories/" + cat_id)
+          .delete("http://127.0.0.1:5000/categories/" + cat_id, {
+            headers: {
+              "Authentication-Token": localStorage.getItem("auth-token"),
+            },
+          })
           .then((response) => {
             console.log(response);
             this.loader();
@@ -427,7 +445,11 @@ export default {
     },
     removeProduct: function (prod) {
       axios
-        .delete("http://127.0.0.1:5000/products?product_id=" + prod)
+        .delete("http://127.0.0.1:5000/products?product_id=" + prod, {
+          headers: {
+            "Authentication-Token": localStorage.getItem("auth-token"),
+          },
+        })
         .then((res) => {
           console.log(res);
           this.loader();
@@ -450,6 +472,7 @@ export default {
           {
             headers: {
               "Content-Type": "application/json",
+              "Authentication-Token": localStorage.getItem("auth-token"),
             },
           }
         )

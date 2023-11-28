@@ -1,6 +1,6 @@
 <template>
   <div>
-    <NavBar />
+    <NavBar :title="email.split('@')[0]" :role="role" />
     <br />
     <v-container>
       <v-row v-for="cat in categories" :key="cat.category_id">
@@ -113,8 +113,9 @@ export default {
     return {
       categories: [],
       dialog: false,
+      role: "",
       cart: [],
-      email: null,
+      email: "",
       cart_item: {
         id: "",
         name: "",
@@ -136,10 +137,22 @@ export default {
   methods: {
     async loader() {
       this.email = localStorage.getItem("email");
+      this.role = localStorage.getItem("role");
       try {
-        const res = await axios.get("http://127.0.0.1:5000/cart/" + this.email);
+        const res = await axios.get(
+          "http://127.0.0.1:5000/cart/" + this.email,
+          {
+            headers: {
+              "Authentication-Token": localStorage.getItem("auth-token"),
+            },
+          }
+        );
         this.cart = res.data;
-        const response = await axios.get("http://127.0.0.1:5000/categories");
+        const response = await axios.get("http://127.0.0.1:5000/categories", {
+          headers: {
+            "Authentication-Token": localStorage.getItem("auth-token"),
+          },
+        });
         this.categories = response.data.map((cat) => ({
           ...cat,
           isInputVisible: false,
@@ -211,6 +224,7 @@ export default {
           {
             headers: {
               "Content-Type": "application/json",
+              "Authentication-Token": localStorage.getItem("auth-token"),
             },
           }
         )
