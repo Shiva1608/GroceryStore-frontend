@@ -22,6 +22,20 @@
         ><v-btn text><span>Home</span> </v-btn>
       </router-link>
     </div>
+    <div v-if="role === 'admin' && $route.path === '/approval'">
+      <router-link to="/admin">
+        <v-btn text>
+          <span class="mr-2">Home</span>
+        </v-btn>
+      </router-link>
+    </div>
+    <div v-if="role === 'admin' && $route.path !== '/approval'">
+      <router-link to="/approval">
+        <v-btn text>
+          <span class="mr-2">Store Approval</span>
+        </v-btn>
+      </router-link>
+    </div>
     <v-btn text @click="logout">
       <span class="mr-2">Logout</span>
     </v-btn>

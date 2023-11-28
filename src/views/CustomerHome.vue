@@ -8,7 +8,7 @@
           {{ cat.category_name }}
         </h1>
         <v-col
-          v-for="prod in cat.products"
+          v-for="prod in filteredProducts(cat.category_id)"
           :key="prod.product_id"
           :cols="getColumns(2)"
         >
@@ -116,6 +116,7 @@ export default {
       role: "",
       cart: [],
       email: "",
+      products: [],
       cart_item: {
         id: "",
         name: "",
@@ -132,6 +133,14 @@ export default {
 
   mounted() {
     this.loader();
+  },
+
+  computed: {
+    filteredProducts() {
+      return (categoryId) => {
+        return this.products.filter((prod) => prod.category_id === categoryId);
+      };
+    },
   },
 
   methods: {
@@ -157,6 +166,12 @@ export default {
           ...cat,
           isInputVisible: false,
         }));
+        const resp = await axios.get("http://127.0.0.1:5000/products", {
+          headers: {
+            "Authentication-Token": localStorage.getItem("auth-token"),
+          },
+        });
+        this.products = resp.data;
       } catch (error) {
         console.log(error);
       }

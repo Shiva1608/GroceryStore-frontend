@@ -5,6 +5,7 @@ import CustomerHome from "../views/CustomerHome.vue";
 import Cart from "../views/Cart.vue";
 import LoginSignup from "../views/LoginSignup.vue";
 import Admin from "../views/Admin.vue";
+import StoreApproval from "../views/StoreApproval.vue";
 
 Vue.use(VueRouter);
 
@@ -85,6 +86,24 @@ const routes = [
       }
     },
     component: Admin,
+  },
+  {
+    path: "/approval",
+    name: "Approval",
+    beforeEnter: (to, from, next) => {
+      if (
+        (localStorage.getItem("auth-token") ? true : false) &&
+        localStorage.getItem("role") === "admin"
+      ) {
+        next();
+      } else {
+        localStorage.removeItem("email");
+        localStorage.removeItem("auth-token");
+        localStorage.removeItem("role");
+        next("/");
+      }
+    },
+    component: StoreApproval,
   },
 ];
 

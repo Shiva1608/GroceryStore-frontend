@@ -3,7 +3,7 @@
     <NavBar :title="email.split('@')[0]" :role="role" />
     <v-row align="center" justify="center">
       <v-col>
-        <v-tabs v-model="tab" centered>
+        <v-tabs v-model="tab" centered background-color="#FF8000" dark>
           <v-tab :key="0">Pending Signups</v-tab>
           <v-tab :key="1">Pending Changes</v-tab>
         </v-tabs>
@@ -42,18 +42,6 @@
                   </v-card-actions>
                 </v-card>
               </v-col>
-            </v-row>
-          </v-tab-item>
-
-          <v-tab-item :key="1">
-            <v-row>
-              <!-- Display Horizontal Cards for Pending Changes -->
-              <!-- <v-col v-for="change in pendingChanges" :key="change.id"> -->
-              <v-card>
-                <!-- <v-card-title>{{ change.username }}</v-card-title> -->
-                <!-- Add other details as needed -->
-              </v-card>
-              <!-- </v-col> -->
             </v-row>
           </v-tab-item>
         </v-tabs-items>
@@ -104,6 +92,7 @@ export default {
           { email: email },
           {
             headers: {
+              "Content-Type": "application/json",
               "Authentication-Token": localStorage.getItem("auth-token"),
             },
           }

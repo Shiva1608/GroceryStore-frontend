@@ -30,7 +30,7 @@
           </v-row>
         </div>
         <v-col
-          v-for="prod in cat.products"
+          v-for="prod in filteredProducts(cat.category_id)"
           :key="prod.product_id"
           :cols="getColumns(2)"
         >
@@ -278,6 +278,7 @@ export default {
       dialog: false,
       rules: [(value) => !!value || "Required!"],
       categories: null,
+      products: [],
       showOptions: false,
       email: "",
       fab: false,
@@ -309,6 +310,13 @@ export default {
   mounted() {
     this.loader();
   },
+  computed: {
+    filteredProducts() {
+      return (categoryId) => {
+        return this.products.filter((prod) => prod.category_id === categoryId);
+      };
+    },
+  },
   methods: {
     loader: async function () {
       this.email = localStorage.getItem("email");
@@ -323,6 +331,12 @@ export default {
           ...cat,
           isInputVisible: false,
         }));
+        const res = await axios.get("http://127.0.0.1:5000/products", {
+          headers: {
+            "Authentication-Token": localStorage.getItem("auth-token"),
+          },
+        });
+        this.products = res.data;
       } catch (error) {
         console.log(error);
       }
