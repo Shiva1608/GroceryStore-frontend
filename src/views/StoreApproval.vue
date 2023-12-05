@@ -2,7 +2,18 @@
   <div>
     <v-container>
       <NavBar :title="email.split('@')[0]" :role="role" />
-      <v-tabs v-model="subTab" centered>
+      <br />
+      <h1
+        style="text-align: center"
+        v-if="changesCat.length === 0 && changesProd.length === 0"
+      >
+        No Pending Approvals for Store !
+      </h1>
+      <v-tabs
+        v-model="subTab"
+        centered
+        v-if="changesCat.length > 0 && changesProd.length > 0"
+      >
         <v-tab :key="'category'">Category Changes</v-tab>
         <v-tab :key="'product'">Product Changes</v-tab>
       </v-tabs>

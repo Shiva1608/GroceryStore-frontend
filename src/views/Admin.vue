@@ -1,50 +1,43 @@
 <template>
   <v-container>
     <NavBar :title="email.split('@')[0]" :role="role" />
+    <br />
+    <h1 style="text-align: center" v-if="info.length > 0">Pending Signups</h1>
+    <h1 style="text-align: center" v-if="info.length === 0">
+      No Pending Signups !
+    </h1>
+    <br />
     <v-row align="center" justify="center">
-      <v-col>
-        <v-tabs v-model="tab" centered background-color="#FF8000" dark>
-          <v-tab :key="0">Pending Signups</v-tab>
-          <v-tab :key="1">Pending Changes</v-tab>
-        </v-tabs>
-        <v-tabs-items v-model="tab">
-          <v-tab-item :key="0">
-            <br />
-            <v-row>
-              <br />
-              <v-col
-                align="center"
-                justify="center"
-                cols="12"
-                v-for="user in info"
-                :key="user.email"
-              >
-                <v-card elevation="5" class="mb-2" outlined max-width="800">
-                  <v-card-title class="pb-0"
-                    >USERNAME : {{ user.username }}</v-card-title
-                  >
-                  <v-card-title>EMAIL : {{ user.email }}</v-card-title>
-                  <v-card-actions class="justify-end pt-0 mb-4 pb-4 mr-4">
-                    <v-btn
-                      large
-                      type="submit"
-                      color="error"
-                      @click="disapprove(user.email)"
-                      >Disaprove</v-btn
-                    >
-                    <v-btn
-                      large
-                      type="submit"
-                      color="success"
-                      @click="approve(user.email)"
-                      >Approve</v-btn
-                    >
-                  </v-card-actions>
-                </v-card>
-              </v-col>
-            </v-row>
-          </v-tab-item>
-        </v-tabs-items>
+      <br />
+      <v-col
+        align="center"
+        justify="center"
+        cols="12"
+        v-for="user in info"
+        :key="user.email"
+      >
+        <v-card elevation="5" class="mb-2" outlined max-width="800">
+          <v-card-title class="pb-0"
+            >USERNAME : {{ user.username }}</v-card-title
+          >
+          <v-card-title>EMAIL : {{ user.email }}</v-card-title>
+          <v-card-actions class="justify-end pt-0 mb-4 pb-4 mr-4">
+            <v-btn
+              large
+              type="submit"
+              color="error"
+              @click="disapprove(user.email)"
+              >Disaprove</v-btn
+            >
+            <v-btn
+              large
+              type="submit"
+              color="success"
+              @click="approve(user.email)"
+              >Approve</v-btn
+            >
+          </v-card-actions>
+        </v-card>
       </v-col>
     </v-row>
   </v-container>
