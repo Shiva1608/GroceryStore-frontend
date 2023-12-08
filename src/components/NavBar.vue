@@ -8,8 +8,23 @@
 
     <v-spacer></v-spacer>
     <div v-if="role === 'manager'">
-      <v-btn text>
-        <span>Summary</span>
+      <v-btn
+        text
+        class="ma-2 white--text"
+        :loading="isWaiting"
+        :disabled="isWaiting"
+        @click="download('download-stock')"
+      >
+        <span>Stock</span>
+      </v-btn>
+      <v-btn
+        text
+        class="ma-2 white--text"
+        :loading="isWaiting1"
+        :disabled="isWaiting1"
+        @click="download('download-sales')"
+      >
+        <span>Sales</span>
       </v-btn>
     </div>
     <div v-if="role === 'customer' && $route.path !== '/cart'">
@@ -43,11 +58,15 @@
 </template>
 
 <script>
+import axios from "axios";
 export default {
   name: "FrontendNavBar",
 
   data() {
-    return {};
+    return {
+      isWaiting: false,
+      isWaiting1: false,
+    };
   },
   props: {
     title: {
@@ -68,6 +87,42 @@ export default {
       localStorage.removeItem("role");
       localStorage.removeItem("auth-token");
       window.location = "/";
+    },
+    async download(work) {
+      if (work === "download-stock") {
+        this.isWaiting = true;
+      } else {
+        this.isWaiting1 = true;
+      }
+      const res = await axios.get(`http://127.0.0.1:5000/${work}`, {
+        headers: {
+          "Authentication-Token": localStorage.getItem("auth-token"),
+        },
+      });
+      if (res.status === 200) {
+        const taskId = res.data.id;
+        const interval = setInterval(async () => {
+          const csv_res1 = await fetch(
+            `http://127.0.0.1:5000/get-csv/${taskId}`
+          );
+          if (csv_res1.ok) {
+            if (work === "download-stock") {
+              this.isWaiting = false;
+            } else {
+              this.isWaiting1 = false;
+            }
+            clearInterval(interval);
+            window.location.href = `http://127.0.0.1:5000/get-csv/${taskId}`;
+          } else {
+            clearInterval(interval);
+            if (work === "download-stock") {
+              this.isWaiting = false;
+            } else {
+              this.isWaiting1 = false;
+            }
+          }
+        }, 2000);
+      }
     },
   },
   filters: {

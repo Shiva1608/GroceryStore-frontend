@@ -3,8 +3,21 @@
     <NavBar :title="email.split('@')[0]" :role="role" />
     <br />
     <v-container>
+      <input
+        class="form-control"
+        type="search"
+        v-model="searchQuery"
+        placeholder="Search"
+        aria-label="Search"
+        style="width: 500px"
+      />
+      <br />
+      <br />
       <v-row v-for="cat in categories" :key="cat.category_id">
-        <h1 class="mb-2 mt-0 ml-0" v-if="!cat.isInputVisible">
+        <h1
+          class="mb-2 mt-0 ml-0"
+          v-if="!cat.isInputVisible && showCategory(cat.category_id)"
+        >
           {{ cat.category_name }}
         </h1>
         <v-col
@@ -51,7 +64,6 @@
             </v-btn>
           </v-card>
         </v-col>
-        <hr />
       </v-row>
     </v-container>
     <router-link to="/cart"
@@ -63,7 +75,7 @@
         elevation="30"
         color="primary"
       >
-        <v-icon>{{ "mdi-cart" }}</v-icon>
+        <v-icon>mdi-cart</v-icon>
       </v-btn>
     </router-link>
 
@@ -114,6 +126,7 @@ export default {
       categories: [],
       dialog: false,
       role: "",
+      searchQuery: "",
       cart: [],
       email: "",
       products: [],
@@ -126,7 +139,7 @@ export default {
       rules: [
         (value) => !!value || "Required!",
         (value) => value > 0 || "Should be greater than 0!",
-        (value) => value < this.cart_item.available || "Limit exceeded!",
+        (value) => value <= this.cart_item.available || "Limit exceeded!",
       ],
     };
   },
@@ -138,7 +151,19 @@ export default {
   computed: {
     filteredProducts() {
       return (categoryId) => {
-        return this.products.filter((prod) => prod.category_id === categoryId);
+        const categoryProducts = this.products.filter(
+          (prod) => prod.category_id === categoryId
+        );
+        return categoryProducts.filter((prod) => {
+          const productNameMatch = prod.product_name
+            .toLowerCase()
+            .includes(this.searchQuery.toLowerCase());
+          const categoryNameMatch = this.categories
+            .find((cat) => cat.category_id === categoryId)
+            .category_name.toLowerCase()
+            .includes(this.searchQuery.toLowerCase());
+          return productNameMatch || categoryNameMatch;
+        });
       };
     },
   },
@@ -175,6 +200,17 @@ export default {
       } catch (error) {
         console.log(error);
       }
+    },
+    showCategory(categoryId) {
+      const category = this.categories.find(
+        (cat) => cat.category_id === categoryId
+      );
+      return (
+        category &&
+        category.category_name
+          .toLowerCase()
+          .includes(this.searchQuery.toLowerCase())
+      );
     },
     checkCart: function (prod_id) {
       return !this.cart.some((item) => item.product_id === prod_id);

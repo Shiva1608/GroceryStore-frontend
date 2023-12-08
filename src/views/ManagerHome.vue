@@ -5,11 +5,31 @@
     <v-container>
       <v-row v-for="cat in categories" :key="cat.category_id">
         <h1 class="mb-2 mt-0 ml-0" v-if="!cat.isInputVisible">
-          {{ cat.category_name }}
-          <v-btn icon large rounded @click="toggle(cat)">
+          {{ cat.category_name
+          }}<v-icon
+            v-if="cat.changes.length > 0"
+            style="opacity: 1"
+            class="pb-1 ml-2"
+            large
+            color="warning"
+            >mdi-sync-alert</v-icon
+          >
+          <v-btn
+            icon
+            large
+            rounded
+            @click="toggle(cat)"
+            v-if="cat.changes.length === 0"
+          >
             <v-icon class="blue--text text--darken-2">mdi-pencil</v-icon>
           </v-btn>
-          <v-btn icon large rounded @click="deleteCat(cat.category_id)">
+          <v-btn
+            v-if="cat.changes.length === 0"
+            icon
+            large
+            rounded
+            @click="deleteCat(cat.category_id)"
+          >
             <v-icon class="red--text text--darken-2">mdi-delete</v-icon>
           </v-btn>
         </h1>
@@ -39,10 +59,21 @@
             elevation="15"
             outlined
             shaped
+            :class="{ disabled: prod.changes.length > 0 }"
             max-width="300"
           >
             <v-card-title>
-              <h3>{{ prod.product_name }}</h3>
+              <h3>
+                {{ prod.product_name
+                }}<v-icon
+                  v-if="prod.changes.length > 0"
+                  style="opacity: 1"
+                  class="justify-end pb-1"
+                  large
+                  color="warning"
+                  >mdi-sync-alert</v-icon
+                >
+              </h3>
             </v-card-title>
             <v-card-text class="pb-0">
               <h5 class="text-h6">
@@ -52,6 +83,7 @@
             </v-card-text>
             <v-btn
               class="ml-0 pl-4 mb-2"
+              :disabled="prod.changes.length > 0"
               color="primary"
               large
               plain
@@ -62,6 +94,7 @@
             <v-btn
               class="ml-2 pl-0 mb-2"
               color="error"
+              :disabled="prod.changes.length > 0"
               plain
               large
               @click="removeProduct(prod.product_id)"
@@ -538,6 +571,9 @@ export default {
 .rotate-transition-enter-active,
 .rotate-transition-leave-active {
   transition: transform 0.5s;
+}
+.disabled {
+  cursor: not-allowed;
 }
 .rotate-transition-enter,
 .rotate-transition-leave-to {
