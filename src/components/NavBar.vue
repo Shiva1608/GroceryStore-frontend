@@ -1,12 +1,13 @@
 <template>
   <v-app-bar app color="primary" dark>
     <div class="d-flex align-center">
-      <h1 style="font-size: 40px" class="navbar-brand">
+      <h1 :style="{ fontSize: getHeaderFontSize }" class="navbar-brand">
         {{ title | capitalize }}'s Dashboard
       </h1>
     </div>
 
     <v-spacer></v-spacer>
+
     <div v-if="role === 'manager'">
       <v-btn
         text
@@ -27,23 +28,22 @@
         <span>Sales</span>
       </v-btn>
     </div>
+
     <div v-if="role === 'customer' && $route.path !== '/cart'">
-      <router-link to="/cart"
-        ><v-btn text><span>Cart</span> </v-btn>
-      </router-link>
-    </div>
-    <div v-if="role === 'customer' && $route.path === '/cart'">
-      <router-link to="/customer"
-        ><v-btn text><span>Home</span> </v-btn>
-      </router-link>
-    </div>
-    <div v-if="role === 'admin' && $route.path === '/approval'">
-      <router-link to="/admin">
+      <router-link to="/cart">
         <v-btn text>
-          <span class="mr-2">Home</span>
+          <span>Cart</span>
         </v-btn>
       </router-link>
     </div>
+    <div v-if="role === 'customer' && $route.path === '/cart'">
+      <router-link to="/customer">
+        <v-btn text>
+          <span>Home</span>
+        </v-btn>
+      </router-link>
+    </div>
+
     <div v-if="role === 'admin' && $route.path !== '/approval'">
       <router-link to="/approval">
         <v-btn text>
@@ -51,6 +51,15 @@
         </v-btn>
       </router-link>
     </div>
+
+    <div v-if="role === 'admin' && $route.path === '/approval'">
+      <router-link to="/admin">
+        <v-btn text>
+          <span class="mr-2">Home</span>
+        </v-btn>
+      </router-link>
+    </div>
+
     <v-btn text @click="logout">
       <span class="mr-2">Logout</span>
     </v-btn>
@@ -80,6 +89,12 @@ export default {
   },
 
   mounted() {},
+
+  computed: {
+    getHeaderFontSize() {
+      return this.$vuetify.breakpoint.xsOnly ? "26px" : "37px";
+    },
+  },
 
   methods: {
     logout() {

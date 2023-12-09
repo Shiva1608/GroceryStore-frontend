@@ -43,8 +43,8 @@
           </h1>
           <div v-else>
             <v-row v-for="(cat, index) in changesCat" :key="index">
-              <v-col cols="2"></v-col>
-              <v-col cols="8">
+              <v-col cols="0" lg="2" md="2"></v-col>
+              <v-col cols="12" lg="8" md="8">
                 <v-card class="mb-4" outlined elevation="10">
                   <v-card-title class="mb-0 pb-2"
                     >Category Name : {{ checker(cat.category_id) }}
@@ -96,8 +96,8 @@
           </h1>
           <div v-else>
             <v-row v-for="(prod, index) in changesProd" :key="index">
-              <v-col cols="2"></v-col>
-              <v-col cols="8">
+              <v-col cols="0" lg="2" md="2"></v-col>
+              <v-col cols="12" lg="8" md="8">
                 <v-card class="mb-4" outlined elevation="10">
                   <v-card-title class="pt-2 mt-2"
                     >Name : {{ prod.product_name }}</v-card-title

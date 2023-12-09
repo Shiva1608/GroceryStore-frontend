@@ -9,7 +9,7 @@
         v-model="searchQuery"
         placeholder="Search"
         aria-label="Search"
-        style="width: 500px"
+        style="width: 400px"
       />
       <br />
       <br />

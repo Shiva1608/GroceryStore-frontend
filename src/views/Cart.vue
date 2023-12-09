@@ -14,7 +14,7 @@
       v-if="items.length > 0"
       :headers="headers"
       :items="items"
-      class="elevation-5"
+      class="elevation-5 overflow-x-auto"
       hide-default-footer
       ><template v-slot:item="{ item, index }">
         <tr>
@@ -44,11 +44,11 @@
     >
     <br />
     <v-row v-if="items.length > 0">
-      <v-col cols="7"></v-col>
-      <v-col cols="3"
+      <v-col cols="2" lg="6" md="5"></v-col>
+      <v-col cols="6" lg="4" md="4"
         ><h3 class="pt-3">TOTAL : Rs.{{ total }} /-</h3></v-col
       >
-      <v-col cols="2"
+      <v-col cols="4" lg="2" md="3"
         ><v-btn x-large color="primary" rounded @click="placeOrder">
           Place Order
         </v-btn></v-col
